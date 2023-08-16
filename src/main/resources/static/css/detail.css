@@ -1,0 +1,12 @@
+.aWrap a {
+	text-decoration: none;
+	color: black;
+}
+
+.badge.text-bg-primary {
+	font-weight: 400;
+}
+
+.card-img-top {
+	max-height: 500px !important;
+}

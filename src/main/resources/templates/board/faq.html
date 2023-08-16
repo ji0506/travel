@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<title>최고의 여행 - 대탈출</title>
+	<link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<script src="/js/jquery.js" />"></script>
+</head>
+
+<body class="d-flex flex-column vh-100">
+	<div th:insert="~{/common/header}"></div>
+
+	<!--<c:if test="${!empty flashMessage}">
+		<div class="container">
+			<div class="row">
+				<div class="col-6 offset-3">
+					<div class="alert alert-primary alert-dismissible fade show" role="alert">
+						${flashMessage}
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>-->
+
+	<section class="container">
+		<div class="row">
+			<div class="col-md-2">
+				<div class="card mb-3">
+					<div class="card-header">고객센터</div>
+					<div class="list-group list-group-flush">
+						<a href="/board/faq.do" class="list-group-item active" id="faqBoard">자주 묻는 질문</a>
+						<a href="/board/qna.do" class="list-group-item" id="qnaBoard">질문과 답변</a>
+						<a href="/board/notice.do" class="list-group-item" id="noticeBoard">공지사항</a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-10 mb-5">
+				<h2 class="mb-4">자주 묻는 질문</h2>
+				<div class="row mb-4">
+					<div class="col-8 offset-2">
+						<form action="">
+							<div class="input-group mb-3">
+								<span class="input-group-text"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+										height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+										<path
+											d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+									</svg> </span> <input type="text" name="keyword" id="keyword" class="form-control"
+									aria-label="Amount (to the nearest dollar)" value="" placeholder="검색어를 입력하세요">
+								<button class="btn btn-dark" type="button" id="btnSearch">검색</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- 메뉴버튼 -->
+				<div class="row mb-4">
+					<div class="btn-group" role="group">
+						<button value="전체" name="menu" type="button" class="btn btn-outline-dark" id="all">전체보기</button>
+						<button value="1" name="menu" type="button" class="btn btn-outline-dark" id="trip">해외여행</button>
+						<button value="2" name="menu" type="button" class="btn btn-outline-dark" id="airline">항공</button>
+						<button value="3" name="menu" type="button" class="btn btn-outline-dark" id="reservation">예약/결제</button>
+						<button value="4" name="menu" type="button" class="btn btn-outline-dark"
+							id="passport">여권/비자/환전</button>
+						<button value="5" type="button" class="btn btn-outline-dark" id="other">홈페이지/기타</button>
+					</div>
+				</div>
+
+				<!-- 페이징 -->
+				<div id="listAll" class="accordion mb-3">
+					<th:set var="number" value="0" />
+						<th:when test="${list ne null }">
+							<th:block th:each="item, number : ${boardlist}">
+
+								<div class="accordion mb-2" th:id="accordionPanelsStayOpenExample">
+									<div class="accordion-item">
+										<h2 class="accordion-header" id="panelsStayOpen-heading-${number.index}">
+											<button class="accordion-button collapsed" type="button"
+												th:data-bs-toggle="collapse"
+												th:data-bs-target="'#panelsStayOpen-collapse-' + ${number.index}"
+												th:aria-controls="'panelsStayOpen-collapse-' + ${number.index}">
+												[[${item.title}]]
+											</button>
+										</h2>
+									</div>
+									</h2>
+									<div th:id="'panelsStayOpen-collapse-' + ${number.index}"
+										class="accordion-collapse collapse"
+										aria-labelledby="'panelsStayOpen-heading-' + ${number.index}">
+										<div class="accordion-body" >
+											[[${item.content}]]
+<!--											<c:if test="${userInfo.member_master eq 'Y'}">
+												<button id="delBtn" type="button" class="btn btn-close"
+													data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+													th:onclick="'setNum(' + ${faq.faq_num} + ')'"
+													data-what="${faq.faq_num}"></button>
+											</c:if>-->
+										</div>
+									</div>
+								</div>
+								<form name="faqInfo">
+									<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+									<input type="hidden" name="faq_num" value="${item.brdNo}">
+								</form>
+							</th:block>
+						</th:when>
+						<!-- <c:otherwise>
+							<h1>게시글이 없습니다.</h1>
+						</c:otherwise> -->
+				</div>
+
+				<!-- Modal -->
+				<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+					tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="staticBackdropLabel">해당 글을 삭제하시겠습니까?</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								삭제된 게시글 정보는 다시 불러올수 없습니다. <br />주의사항을 확인 후 삭제하시겠습니까?
+							</div>
+							<div class="modal-footer">
+								<button id="btnDelCancel" type="button" class="btn btn-secondary"
+									data-bs-dismiss="modal">취소</button>
+								<button id="btnDelAgree" type="button" class="btn btn-primary"
+									onclick="clickDel(faqInfo)">삭제</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 페이징처리 
+				<div id="pagingAll">
+					<nav id="allPaging" aria-label="Page navigation mb-3">
+						<ul class="pagination justify-content-center">
+							<th:block th:if="${pm.first}">
+								<li class="page-item">
+									<a class="page-link" href="${pm.makeQuery(1)}">
+										<span aria-hidden="true">&laquo;</span>
+									</a>
+								</li>
+							</th:block>
+							<th:block th:if="${pm.prev}">
+								<li class="page-item">
+									<a class="page-link" href="${pm.makeQuery(pm.startPage-1)}">&lt;</a>
+								</li>
+							</th:block>
+							<th:forEach var="i" begin="${pm.startPage}" end="${pm.endPage}">
+								<li class="page-item" aria-current="page" ${( pm.cri.page==i)? 'class="active"' :''}>
+									<a id="pageNum" class="page-link" href="${pm.makeQuery(i)}">1</a>
+								</li>
+							</th:forEach>
+							<th:block th:if="${pm.next}">
+								<li class="page-item">
+									<a class="page-link" href="${pm.makeQuery(pm.endPage+1)}">&gt;</a>
+								</li>
+							</th:block>
+							<th:block th:if="${pm.last}">
+								<li class="page-item">
+									<a class="page-link" href="${pm.makeQuery(pm.maxPage)}">
+										<span aria-hidden="true">&raquo;</span>
+									</a>
+								</li>
+							</th:block>
+						</ul>
+					</nav>
+				</div>-->
+
+				<div class="row">
+					<th:block sec:authorize="hasAnyRole('ROLE_ADMIN')">
+						<div class="text-end mb-3">
+							<button class="btn btn-outline-secondary" id="addBtn">추가하기</button>
+						</div>
+			    	</th:block>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script>
+		var faqnum;
+		function setNum(num) {
+			faqnum = num;
+			console.log(faqnum)
+		}
+		/* var userInfo= "<%=session.getAttribute("userInfo")%>";
+		console.log("userInfo: "+userInfo);
+		var userMaster= '${userInfo.member_master}';*/
+
+		$("#addBtn").click(function () {
+			location.href = "/board/faqWrite.do";
+		});
+
+		$("#qnaBoard").click(function () {
+			location.href = "board/qna";
+		});
+
+		$("#faqBoard").click(function () {
+			location.href = "board/faq";
+		});
+
+		$("#noticeBoard").click(function () {
+			location.href = "board/notice";
+		});
+
+		$("#all").on("click", function () {
+			location.href = "/board/faq.do";
+		});
+
+		$("#trip").on("click", function () {
+			var menu = $("#trip").val();
+
+			location.href = "/board/trip.do?menu=" + menu;
+		});
+
+		$("#airline").on("click", function () {
+			var menu = $("#airline").val();
+
+			location.href = "/board/trip.do?menu="+menu;
+		});
+
+		$("#reservation").on("click", function () {
+			var menu = $("#reservation").val();
+
+			location.href = "/board/trip.do?menu="+menu;
+		});
+
+		$("#passport").on("click", function () {
+			var menu = $("#passport").val();
+
+			location.href = "/board/trip.do?menu="+menu;
+		});
+
+		$("#other").on("click", function () {
+			var menu = $("#other").val();
+
+			location.href = "/board/trip.do?menu="+menu;
+		});
+
+		function clickDel(formName) {
+			for (var tag of formName) {
+				if (tag.faq_num.value == faqnum) {
+					tag.action = "/board/faqDelete";
+					tag.method = "post";
+					tag.submit();
+				}
+			}
+		}
+
+		$("#btnSearch").click(function () {
+			location.href = "/board/faq?keyword=" + $("#keyword").val();
+
+		});
+
+		$('input[type="text"]').keydown(function () {
+			if (event.keyCode === 13) {
+				event.preventDefault();
+				$("#btnSearch").click();
+			};
+		});
+
+		var pageUrl = window.location.href;
+		$(window).on('load', function () {
+
+		});
+
+	</script>
+	<div th:insert="~{/common/footer}"></div>
+
+</body>
+
+</html>

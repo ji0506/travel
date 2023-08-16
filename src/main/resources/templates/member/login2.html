@@ -1,0 +1,85 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+	<title>최고의 여행 - 대탈출</title>
+	<link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<script src="/js/jquery.js"/>"></script>
+</head>
+<script type="text/javascript">
+
+</script>
+
+<body class="d-flex flex-column vh-100">
+	<div th:insert="~{/common/header}"></div>
+
+
+<section class="container d-flex flex-column justify-content-center align-items-center h-100">
+	<div class="row mb-3">
+		<h3 class="mb-3">로그인</h3>
+		<form action="/login-process.do" method="post">
+			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+			<div class="row mb-3">
+				<div class="col-md-9">
+					<input type="text" id="userId" class="form-control mb-3" name="userId" placeholder="id" th:value="${id}" /> 
+					<input type="password" id="userPwd" class="form-control" name="userPwd" placeholder="password" />
+
+				    <div th:if="${session == null}">
+				    	<p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+				    </div>					
+        			<input type="hidden" id="errMsg" th:value="${errorMsg}" />
+				</div>
+				<div class="col-md-3">
+					<button id="loginBtn" class="btn btn btn-primary w-100 h-100">로그인</button>
+				</div>
+			</div>
+			<div class="form-check">
+<!--				<input class="form-check-input" type="checkbox" name="remember-me" id="remember_id">
+				<label class="form-check-label" for="remember_id">자동 로그인</label>-->
+			</div>
+		</form>
+	</div>
+	<div>
+		<button id="joinBtn" type="button" class="btn btn-primary">회원가입</button>
+		<button id="idFinder" type="button" class="btn btn-primary">아이디 찾기</button>
+		<button id="pwFinder" type="button" class="btn btn-primary">비밀번호 찾기</button>
+	</div>
+</section>
+<script>
+$(function() {
+		$('#formContent #userID').focus();
+		
+		// 에러가 있는 경우 메세지 처리
+		var errMsg = $('#errMsg').val();
+		if(errMsg != '') {
+			alert(errMsg);
+			$('#formContent').find('#userID').focus();
+		}
+		
+	document.querySelector('#joinBtn').addEventListener('click', () => {
+		location.href = 'join.do';
+	});
+
+	var errMsg = $('#errMsg').val();
+	if(errMsg != '') {
+		alert(errMsg);
+		$('#formContent').find('#userID').focus();
+	}
+
+	$("#idFinder").click(function () {
+		location.href = 'id_find';
+	});
+
+	$("#pwFinder").click(function () {
+		location.href = 'pw_find';
+	});
+
+		
+});
+	
+</script>
+	<div th:insert="~{/common/footer}"></div>
+	
+	</body>
+</html>

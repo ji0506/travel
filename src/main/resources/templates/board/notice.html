@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta charset="UTF-8">
+  <title>최고의 여행 - 대탈출</title>
+  <link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <script src="/js/jquery.js" />"></script>
+</head>
+
+<body class="d-flex flex-column vh-100">
+<div th:insert="~{/common/header}"></div>
+
+<section class="container">
+  <div class="row">
+    <div class="col-md-2">
+      <div class="card mb-3">
+        <div class="card-header">고객센터</div>
+        <div class="list-group list-group-flush">
+          <a th:href="@{/board/faq.do}" class="list-group-item" id="faqBoard">자주 묻는 질문</a>
+          <a th:href="@{/board/qna.do}" class="list-group-item" id="qnaBoard">질문과 답변</a>
+          <a th:href="@{/board/notice.do}" class="list-group-item active" id="noticeBoard">공지사항</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-10 mb-5">
+      <h2 class="mb-4">공지사항</h2>
+      <div class="mb-4">
+        <div class="btn-group" role="group">
+          <button type="button" value="전체" class="btn btn-outline-dark" id="all">전체</button>
+          <button type="button" value="공지사항" class="btn btn-outline-dark" id="notice">공지사항</button>
+          <button type="button" value="외교부소식" class="btn btn-outline-dark" id="mofa">외교부소식</button>
+        </div>
+      </div>
+
+      <div class="table-responsive" id="listAll">
+        <table class="table table-striped">
+          <thead>
+          <tr class="table-warning">
+            <th class="col-sm-2">구분</th>
+            <th class="col-sm-6">제목</th>
+            <th class="col-sm-2">작성자</th>
+            <th class="col-sm-2">작성일</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:if="${noticeList != null}">
+            <th:block th:each="n : ${noticeList}">
+              <tr>
+                <td class="col-sm-2" th:text="${n.cateNo}"></td>
+                <td class="col-sm-6"><a th:href="@{/board/noticeDetail.do?notiNo={id}(id=${n.notiNo})}"
+                                        th:text="${n.title}"></a></td>
+                <td class="col-sm-2" th:text="${n.userId}"></td>
+                <td class="col-sm-2">
+                  <span th:text="${#dates.format(n.regDate, 'yyyy.MM.dd')}"></span>
+                </td>
+              </tr>
+            </th:block>
+          </th:block>
+          <th:block th:unless="${noticeList != null}">
+            <tr>
+              <td colspan="5"><h1>현재 게시글이 존재하지 않습니다.</h1></td>
+            </tr>
+          </th:block>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+           tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">해당 글을 삭제하시겠습니까?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                      aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              삭제된 게시글 정보는 다시 불러올수 없습니다. <br />주의사항을 확인 후 삭제하시겠습니까?
+            </div>
+            <div class="modal-footer">
+              <button id="btnDelCancel" type="button" class="btn btn-secondary"
+                      data-bs-dismiss="modal">취소</button>
+              <button id="btnDelAgree" type="button" class="btn btn-primary"
+                      onclick="clickDel(faqInfo)">삭제</button>
+            </div>
+          </div>
+        </div>
+      </div>
+<!--
+      <div id="pagingAll">
+        <nav id="allPaging" aria-label="Page navigation mb-3">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" th:if="${pm.first}">
+              <a class="page-link" th:href="${pm.makeQuery(1)}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item" th:if="${pm.prev}">
+              <a class="page-link" th:href="${pm.makeQuery(pm.startPage - 1)}">&lt;</a>
+            </li>
+            <li class="page-item" th:each="i : ${pm.pages}" th:class="${pm.cri.page == i ? 'active' : ''}">
+              <a class="page-link" th:href="${pm.makeQuery(i)}" th:text="${i}"></a>
+            </li>
+            <li class="page-item" th:if="${pm.next}">
+              <a class="page-link" th:href="${pm.makeQuery(pm.endPage + 1)}">&gt;</a>
+            </li>
+            <li class="page-item" th:if="${pm.last}">
+              <a class="page-link" th:href="${pm.makeQuery(pm.maxPage)}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>-->
+		<th:block sec:authorize="hasAnyRole('ROLE_ADMIN')">
+        	<div class="text-end mb-3">
+          		<button class="btn btn-outline-secondary" id="addBtn">새글 작성</button>
+        	</div>
+    	</th:block>
+    </div>
+  </div>
+</section>
+<script th:inline="javascript">
+        /*<![CDATA[*/
+
+        $("#addBtn").click(function () {
+            location.href = "noticeWrite.do";
+        });
+
+        $("#all").on("click", function () {
+            location.href = "notice.do";
+        });
+
+        $("#notice").on("click", function () {
+            location.href = "/board/inform.do";
+        });
+
+        $("#mofa").on("click", function () {
+            location.href = "/board/mofa.do";
+        });
+
+        var pageUrl = window.location.href;
+
+        $(window).on('load', function () {
+            $('.btn-group').siblings('button').removeClass('active');
+
+            if (pageUrl.indexOf('inform') > -1) {
+                $("#notice").addClass('active');
+            } else if (pageUrl.indexOf('mofa') > -1) {
+                $("#mofa").addClass('active');
+            } else if (pageUrl.indexOf('airline') > -1) {
+                $(".btn-outline-dark").removeClass('active');
+            }
+        });
+
+        /*]]>*/
+    </script>
+<div th:insert="~{/common/footer}"></div>
+</body>
+</html>

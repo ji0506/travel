@@ -1,0 +1,25 @@
+.accordion-body:hover {
+	cursor: pointer;
+}
+
+.position-fixed {
+	top: 50%;
+}
+
+@media ( min-width : 992px) {
+	.position-fixed {
+		left: 88%;
+	}
+}
+
+@media ( min-width : 1200px) {
+	.position-fixed {
+		left: 86%;
+	}
+}
+
+@media ( min-width : 1444px) {
+	.position-fixed {
+		left: 84%;
+	}
+}

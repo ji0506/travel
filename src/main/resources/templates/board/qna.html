@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<title>최고의 여행 - 대탈출</title>
+	<link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<script src="/js/jquery.js" />"></script>
+</head>
+
+<body class="d-flex flex-column vh-100">
+<div th:insert="~{/common/header}"></div>
+
+<section class="container">
+	<div class="row">
+		<div class="col-md-2">
+			<div class="card mb-3">
+				<div class="card-header">고객센터</div>
+				<div class="list-group list-group-flush">
+					<a href="/board/faq.do" class="list-group-item" id="faqBoard">자주 묻는 질문</a>
+					<a href="/board/qna.do" class="list-group-item active" id="qnaBoard">질문과 답변</a>
+					<a href="/board/notice.do" class="list-group-item" id="noticeBoard">공지사항</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-10 mb-5">
+			<h2 class="mb-4">질문과 답변</h2>
+			<div class="mb-4">
+				<div class="dropdown">
+					<a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						보기
+					</a>
+					<ul class="dropdown-menu">
+						<li><a class="dropdown-item" href="/board/qna.do">전체</a></li>
+						<li><a class="dropdown-item" href="/board/qna.do/checking">확인중</a></li>
+						<li><a class="dropdown-item" href="/board/qna.do/checked">답변 완료</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+					<tr class="table-warning">
+						<th class="col-sm-2">구분</th>
+						<th class="col-sm-6">제목</th>
+						<th class="col-sm-2">글쓴이</th>
+						<th class="col-sm-2">등록일</th>
+					</tr>
+					</thead>
+					<tbody class="table table-info">
+					<th:block th:if="${qnaNoticeList != null}">
+						<th:block th:each="item, n : ${qnaNoticeList}">
+							<tr>
+								<td class="col-sm-2" th:text="${n.notice_category}"></td>
+								<td class="col-sm-6">
+									<a  th:href="@{/board/noticeDetail}" th:attr="href='/board/noticeDetail?notice_num=' + ${n.notice_num}" th:text="${n.notice_title}"></a>
+								</td>
+								<td class="col-sm-2" th:text="${n.notice_writer}"></td>
+								<td class="col-sm-2">
+									<span th:text="${#dates.format(n.notice_regdate, 'yyyy.MM.dd')}"></span>
+								</td>
+							</tr>
+						</th:block>
+					</th:block>
+					<th:block th:if="${qnaList == null}">
+						<tr>
+							<td colspan="4"><h1>현재 게시글이 존재하지 않습니다.</h1></td>
+						</tr>
+					</th:block>
+					</tbody>
+					<tbody class="table table-striped">
+					<th:block th:if="${qnaList != null}">
+						<th:block th:each="q, n : ${qnaList}">
+							<tr>
+									<td id="2" class="col-sm-1">답변완료</td>
+<!--								<th:block th:if="${q.qna_answer != null}">
+								</th:block>-->
+								<th:block th:if="${session.isEmpty()}">
+									<td class="col-sm-6">작성자 외에는 확인할수 없습니다.</td>
+								</th:block>
+								<th:block th:unless="${session.isEmpty()}">
+									<th:block th:if="${q.userId == session.user.userId  }">
+										<td id="qnaTitle" class="col-sm-6">
+											<a th:href="@{/board/qnaDetail}" th:attr="href='/board/qnaDetail?qna_num=' + ${q.qnaNo}" th:text="${q.qnaTitle}"></a>
+										</td>
+									</th:block>
+									<th:block th:unless="${q.userId == session.user.userId  }">
+										<td class="col-sm-6">작성자 외에는 확인할수 없습니다.</td>
+									</th:block>
+								</th:block>
+								<td id="qnaWriter" class="col-sm-2">
+									<span th:text="${q.userId}"></span>
+								</td>
+								<td class="col-sm-2">
+									<span th:text="${#dates.format(q.regDate, 'yyyy.MM.dd')}"></span>
+								</td>
+							</tr>
+						</th:block>
+					</th:block>
+					<th:block th:if="${qnaList == null}">
+						<tr>
+							<td colspan="4"><h1>현재 게시글이 존재하지 않습니다.</h1></td>
+						</tr>
+					</th:block>
+					</tbody>
+				</table>
+			</div>
+			<div class="mb-4 text-end">
+				<button type="button" class="btn btn-outline-secondary" id="addBtn">글쓰기</button>
+<!--				<button type="button" class="btn btn-outline-secondary" id="myQNA">나의 질문</button>-->
+			</div>
+		</div>
+	</div>
+</section>
+<script src="/resources/js/popper.min.js"></script>
+<script>
+    $("#addBtn").click(function(){
+        location.href = "qnaWrite.do";
+    });
+
+    $("#myQNA").click(function(){
+        location.href = "qnaDetail.do";
+    });
+</script>
+<div th:insert="~{/common/footer}"></div>
+
+</body>
+</html>

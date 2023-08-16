@@ -1,0 +1,9 @@
+.tiny-p {
+    max-height: 500px;
+    overflow: auto;
+}
+
+.tiny-index {
+    max-height: 225px;
+    overflow: hidden;
+}

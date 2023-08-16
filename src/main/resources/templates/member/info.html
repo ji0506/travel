@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<title>최고의 여행 - 대탈출</title>
+	<link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<script src="/js/jquery.js" />"></script>
+</head>
+
+<body class="d-flex flex-column vh-100">
+	<div th:insert="~{/common/header}"></div>
+
+	<!--<c:if test="${!empty flashMessage}">
+		<div class="container">
+			<div class="row">
+				<div class="col-6 offset-3">
+					<div class="alert alert-primary alert-dismissible fade show" role="alert">
+						${flashMessage}
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>-->
+	<section class="container">
+	<div class="row">
+		<div class="col-md-2">
+			<div class="card mb-3">
+				<div class="card-header">
+					마이 페이지
+				</div>
+				<div class="list-group list-group-flush">
+					<a href="myPage" class="list-group-item active">예약내역 확인</a>
+					<a href="edit_check" class="list-group-item">정보수정/탈퇴</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-10 mb-5">
+			<h2 class="mb-4">예약 내역 확인</h2>
+			<div class="mb-4">
+				<div class="dropdown">
+				</div>
+			</div>
+			<div class="table-responsive">
+				<table class="table table-bordered text-center">
+					<thead>
+						<tr class="table-info">
+							<th>예약 상품</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<th:block th:each="item, stat : ${list}" th:unless="${#lists.isEmpty(list)}">
+							<tr>
+								<td><span>[[${item.product.proName}]]</span><span> </span><span>/ [[${item.product.proPlan}]]박 [[${item.product.proPlan+1}]]일</span></td>
+								<td><a th:href="@{reservDetail?proNo={id}(id=${item.proNo})}">[예약상세내역]</a></td>
+							</tr>
+						</th:block>
+						<th:block th:if="${#lists.isEmpty(list)}">
+							<tr>
+								<td><span>예약하신 상품이 없습니다.</span></td>
+							</tr>
+						</th:block>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</section>
+<script>
+</script>
+	<div th:insert="~{/common/footer}"></div>
+
+</body>
+
+</html>

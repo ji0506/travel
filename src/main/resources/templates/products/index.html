@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<title>최고의 여행 - 대탈출</title>
+	<link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<link rel="stylesheet" th:href="@{/css/product.index.css}">
+
+</head>
+
+<body class="d-flex flex-column vh-100">
+	<div th:insert="~{/common/header}"></div>
+
+	<!--<c:if test="${!empty flashMessage}">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 offset-3">
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    ${flashMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</c:if>-->
+	<th:block th:if="${#lists.isEmpty(list)}">
+		<section class="container d-flex flex-column justify-content-center align-products-center h-100">
+			<div class="alert alert-danger" role="alert">
+				<h4 class="alert-heading m-0">일치하는 상품 정보가 존재하지 않습니다.</h4>
+			</div>
+			<th:block sec:authorize="hasAnyRole('ROLE_ADMIN')">
+				<a id="newBtn" th:href="@{/products/new}" class="btn btn-primary">상품 등록</a>
+			</th:block>
+		</section>
+	</th:block>
+	<th:block th:unless="${#lists.isEmpty(list)}">
+		<section class="container d-flex justify-content-center mt-5">
+			<div class="row w-100">
+				<main class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+					<!--					<h3 class="mb-3">${list[0].product_continent}</h3>-->
+					<div>
+						<h3 class="mb-3 d-inline-block">[[${continent}]]</h3>
+					</div>
+					<th:block th:each="country, stat : ${countrySet}">
+						<div class="card mb-4">
+							<div class="card-header">
+								<h4 class="card-title m-0">[[${country}]]</h4>
+							</div>
+							<th:block th:each="product, stat : ${list}" th:if="${product.proCountry == country}">
+								<div class="card-body border-bottom">
+									<div class="row g-0">
+										<div
+											class="col-sm-10 col-md-9 col-lg-8 col-xl-7 d-flex flex-column justify-content-center">
+											<p class="card-title" th:text="${product.proCity} ">[[${product.proName}]]
+											</p>
+											<p class="card-text">
+												[[${product.proAirplane}]]
+												<br>
+												[[${#dates.format(product.proDeparture, 'yyyy-MM-dd')}]] ~
+												[[${#dates.format(product.proArrive, 'yyyy-MM-dd')}]]
+											</p>
+										</div>
+										<div class="col-sm-2 col-md-3 col-lg-4 col-xl-5 text-center text-sm-end">
+											<p class="card-text">잔여좌석: [[${product.proSeat}]]</p>
+											<th:block th:if="${product.proSeat > 5}">
+												<button class="btn btn-primary"
+													th:data-num="${product.proNo}">상세보기</button>
+											</th:block>
+											<th:block th:if="${5 >= product.proSeat and product.proSeat > 0}">
+												<button type="button" class="btn btn-warning position-relative"
+													th:data-num="${product.proNo}">상세보기
+													<span
+														class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-warning">마감
+														임박!</span>
+												</button>
+											</th:block>
+											<th:block th:if="${product.proSeat eq 0}">
+												<button type="button" class="btn btn-danger position-relative"
+													th:data-num="${product.proNo}">상세보기
+													<span
+														class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">마감!</span>
+												</button>
+											</th:block>
+										</div>
+									</div>
+								</div>
+							</th:block>
+						</div>
+					</th:block>
+				</main>
+
+				<th:block sec:authorize="hasAnyRole('ROLE_ADMIN')">
+					<a id="newBtn" th:href="@{/products/new}" class="btn btn-primary">상품 등록</a>
+				</th:block>
+			</div>
+			<div class="card mb-3 position-fixed translate-middle d-none d-lg-block">
+				<div class="card-header ">
+					<h3 class="fs-5 card-title text-center m-0">[[${continent}]]</h3>
+				</div>
+				<th:block th:each="country, countryNum : ${countrySet}" th:unless="${#lists.isEmpty(countrySet)}">
+					<div class="accordion" id="accordion">
+						<div class="accordion-product">
+							<h4 class="accordion-header" id="heading">
+								<button class="accordion-button" th:classappend="${countryNum.count != 1} ? 'collapsed'"
+									type="button" data-bs-toggle="collapse" data-bs-target="#collapse"
+									aria-expanded="true" aria-controls="collapse">
+									[[${country}]]
+								</button>
+							</h4>
+						<!--	<div id="collapse" class="accordion-collapse collapse"  th:classappend="${countryNum == 1} ? 'show'" aria-labelledby="heading">
+					        	<th:block th:each="city : ${cityMap[__${country}__]" th:if="${product.proCountry == country}">
+					            	<div class="accordion-body" th:data-city="${city}">
+					            		[[${city}]]
+									</div>
+								</th:block>
+					      	</div>-->
+						</div>
+					</div>
+				</th:block>
+			</div>
+		</section>
+	</th:block>
+	<div th:insert="~{/common/footer}"></div>
+
+</body>
+<script src="/js/jquery.js" />"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+	const main = document.querySelector("main");
+
+	document.querySelectorAll(".accordion-body").forEach(tag => tag.addEventListener("click", function () {
+		axios.get("/product/city/" + this.getAttribute("data-city"))
+			.then(function (response) {
+				let html = makeHtml(response.data);
+				main.innerHTML = html;
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+	}));
+
+	const makeHtml = array => {
+		let html = '<h3 class="mb-3">' + array[0].proCountry + '</h3>';
+		html += '<div class="card mb-4">';
+		html += '<div class="card-header">';
+		html += '<h4 class="card-title m-0">' + array[0].proCity + '</h4>';
+		html += '</div>';
+		for (let product of array) {
+			html += '<div class="card-body border-bottom">';
+			html += '<div class="row g-0">';
+			html += '<div class="col-sm-10 col-md-9 col-lg-8 col-xl-7 d-flex flex-column justify-content-center">';
+			html += '<p class="card-title">[' + product.proCity + '] ' + product.proName; + '</p>';
+			html += '<p class="card-text">';
+			html += product.proAirplane + ' ';
+			html += dateString(new Date(product.proDeparture));
+			html += ' ~ ';
+			html += dateString(new Date(product.proArrive));
+			html += '</p>';
+			html += '</div>';
+			html += '<div class="col-sm-2 col-md-3 col-lg-4 col-xl-5 text-center text-sm-end">';
+			html += '<p class="card-text">잔여좌석:' + product.proSeat + '</p>';
+			const seat = product.proSeat;
+			if (seat > 5) {
+				html += '<button class="btn btn-primary" th:data-num="' + product.proNo + '">상세보기</button>';
+			} else {
+				html += '<button type="button" class="btn btn-danger position-relative" th:data-num="${product.proNo}">상세보기';
+				html += '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">마감 임박!</span></button>';
+			}
+			html += '</div></div></div>';
+		}
+		return html;
+	};
+
+	const dateString = date => {
+		const year = date.getFullYear();
+		let month = date.getMonth() + 1;
+		let day = date.getDate();
+		month = (month >= 10) ? month : "0" + month;
+		day = (day >= 10) ? day : "0" + day;
+		return year + "-" + month + "-" + day;
+	};
+	main.addEventListener("click", function (event) {
+		const target = event.target;
+		if (target.tagName !== "BUTTON") return;
+		location.href = '/products/' +target.getAttribute("data-num");
+	});
+
+</script>
+
+</html>

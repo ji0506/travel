@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>최고의 여행 - 대탈출</title>
+    <link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+        <link rel="stylesheet" th:href="@{/css/detail.css}">
+    <link rel="stylesheet" th:href="@{/css/tiny.css}">
+
+
+</head>
+
+<body class="d-flex flex-column vh-100">
+<div th:insert="~{/common/header}"></div>
+
+<!--<c:if test="${!empty flashMessage}">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 offset-3">
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    ${flashMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</c:if>-->
+
+<section class="container mb-3">
+    <div class="row mb-3 pt-1">
+        <div class="aWrap ps-3">
+            <a href="*">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h1v6.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5zm11-11V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
+                    <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z" />
+                </svg>
+            </a>
+            <span>&nbsp;&gt;&nbsp;</span>
+            <a th:href="@{'/products/continent/' + ${product.proContinent}}">[[${product.proContinent}]]</a>
+            <span>&nbsp;&gt;&nbsp;</span>
+            <a th:href="@{'search?country=' + ${product.proCountry}}">[[${product.proCountry}]]</a>
+            <span>&nbsp;&gt;&nbsp;</span>
+            <a th:href="@{'search?city=' + ${product.proCity}}">[[${product.proCity}]]</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card mb-3">
+                <img th:src="@{/upload/site/{id}{img}(id=${detail.proNo},img=${detail.detailImage})}" class="card-img-top" alt="..."> 
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h2 class="fs-5 card-title m-0 p-1">[[${product.proCountry}]]/[[${product.proCity}]] [[${product.proName}]]</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <span class="fs-6 badge text-bg-primary me-2 p-2">항공편</span>
+                            <span class="card-text d-inline-block">[[${product.proAirplane}]]</span>
+                        </div>
+                        <div class="col">
+                            <span class="fs-6 badge text-bg-primary me-2 p-2">잔여좌석</span>
+                            <span class="card-text d-inline-block">[[${product.proSeat}]]</span>
+                            <th:block th:if="${product.proSeat <= 5}">
+                                <span class="ms-2 badge text-bg-danger">마감 임박</span>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <span class="fs-6 badge text-bg-primary me-2 p-2">성인요금</span>
+                            <span class="card-text d-inline-block">
+								<fmt:formatNumber type="number" maxFractionDigits="3" value="${product.proAdult}" />[[${product.proAdult}]]원
+							</span>
+                        </div>
+                        <div class="col">
+                            <span class="fs-6 badge text-bg-primary me-2 p-2">소인요금</span>
+                            <span class="card-text d-inline-block">
+								<fmt:formatNumber type="number" maxFractionDigits="3" value="${product.proMinor}" />[[${product.proMinor}]]원
+							</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <span class="fs-6 badge text-bg-primary me-2 p-2">출발일정</span>
+                            <span class="card-text d-inline-block">
+								[[${#dates.format(product.proDeparture, 'yyyy-MM-dd')}]]
+							</span>
+                        </div>
+                        <div class="col">
+                            <span class="fs-6 badge text-bg-primary me-2 p-2">도착일정</span>
+                            <span class="card-text d-inline-block">
+								[[${#dates.format(product.proArrive, 'yyyy-MM-dd')}]]
+							</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col d-flex justify-content-around">
+                    <th:block sec:authorize="hasAnyRole('ROLE_USER','ROLE_ADMIN')">
+                    	<a th:href="@{${'/products/' + product.proNo + '/reservation'}}" class="btn btn-primary" id="reserveBtn">예약하기</a>
+                        <a th:href="@{board/faq}" class="btn btn-primary" id="qnaBtn">문의하기</a>
+                   	</th:block>
+                    <th:block sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a th:href="@{${'/products/' + product.proNo + '/update'}}" class="btn btn-primary" id="reserveBtn">수정</a>
+                        <!--<a th:href="@{products/${product.proNo}/update}" class="btn btn-primary" id="reserveBtn">상품 수정</a>-->
+                        <a id="deleteBtn" th:href="@{${'/products/' + product.proNo + '/delete'}}" class="btn btn-primary">상품 삭제</a>
+                        <!--<a id="deleteBtn" th:href="@{products/${product.proNo}/delete}" class="btn btn-primary">상품 삭제</a>-->
+                        <form id="deleteForm" class="d-none">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                        </form>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row px-3">
+        <div class="card mb-3">
+            <div class="card-body border-bottom tiny-p">
+                <h3 class="card-title m-0 fs-5 mb-3">상품 설명</h3>
+                <div th:utext="${detail.detailInfo}"></div>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-body tiny-p">
+                <h3 class="card-title m-0 fs-5 mb-3">상세 일정</h3>
+                <div th:utext="${detail.schedule}"></div>
+            </div>
+        </div>
+    </div>
+</section>
+<div th:insert="~{/common/footer}"></div>
+
+</body>
+<script src="/js/jquery.js"/>"></script>
+</html>

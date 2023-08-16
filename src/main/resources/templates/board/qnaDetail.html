@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>최고의 여행 - 대탈출</title>
+  <link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <script src="/js/jquery.js"></script>
+</head>
+
+<body class="d-flex flex-column vh-100">
+<div th:insert="~{/common/header}"></div>
+
+<section class="container">
+  <div class="row">
+    <div class="col-md-2">
+      <div class="card mb-3">
+        <div class="card-header">고객센터</div>
+        <div class="list-group list-group-flush">
+          <a href="/board/faq.do" class="list-group-item" id="faqBoard">자주 묻는 질문</a>
+          <a href="/board/qna.do" class="list-group-item active" id="qnaBoard">질문과 답변</a>
+          <a href="/board/notice.do" class="list-group-item" id="noticeBoard">공지사항</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-10 mb-5">
+      <h2 class="mb-4">질문과 답변</h2>
+      <div class="card mb-5">
+        <div class="card-header">
+          <h3 class="card-title" th:text="${qna.qna_title}"></h3>
+            작성자:<p id="writer" class="card-text text-muted d-inline">&nbsp;<span th:text="${qna.qna_writer}"></span></p><br/>
+          작성일:<p class="card-text text-muted d-inline">&nbsp;<span th:text="${#dates.format(qna.qna_regdate, 'yyyy.MM.dd')}"></span></p>
+        </div>
+        <div class="card-body">
+          <p class="card-text" th:text="${qna.qna_question}"></p>
+        </div>
+      </div>
+
+      <th:block th:if="${not #lists.isEmpty(commentList)}">
+        <div class="card">
+          <div class="card-header">등록된 답변</div>
+          <ul class="list-group list-group-flush">
+            <th:block th:each="reply : ${commentList}">
+              <li class="list-group-item" th:text="${reply.qna_answer}"></li>
+            </th:block>
+          </ul>
+        </div>
+      </th:block>
+      <div id="addedcommentList"></div>
+
+      <th:block th:if="${userInfo.member_master eq 'Y'}">
+        <!-- Comments Form -->
+        <div class="card my-4">
+          <h5 class="card-header">답변을 작성하세요</h5>
+          <div class="card-body">
+            <form name="comment-form" action="comment" method="post" autocomplete="off">
+              <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+              <div class="form-group">
+                <input type="hidden" name="qna_num" th:value="${qna.qna_num}">
+                <input type="hidden" name="comment_writer" th:value="${userInfo.member_name}">
+                <textarea name="qna_answer" class="form-control mytextarea" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">등록</button>
+            </form>
+          </div>
+        </div>
+      </th:block>
+    </div>
+  </div>
+</section>
+<script src="https://cdn.tiny.cloud/1/mreuxwvmvo99s2c3asxl4t6ujhyqgni44dt6mle4qlfz9pq6/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: '.mytextarea',
+        height: 300,
+        language: 'ko_KR',
+        plugins: [
+            'advlist autolink link image lists charmap print preview hr anchor pagebreak',
+            'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+            'table emoticons template paste help'
+        ],
+        toolbar: 'undo redo | styleselect | bold italic image | alignleft aligncenter alignright alignjustify | outdent indent',
+        menubar: false,
+        image_title: true,
+        images_upload_url: '${contextPath}/products/htmlImage',
+        images_reuse_filename: true,
+        relative_urls: false,
+        file_picker_types: 'image',
+        file_picker_callback: function (cb, value, meta) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.onchange = function () {
+                var file = this.files[0];
+                var reader = new FileReader();
+                reader.onload = function () {
+                    var id = 'blobid' + (new Date()).getTime();
+                    var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                    var base64 = reader.result.split(',')[1];
+                    var blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+                    cb(blobInfo.blobUri(), {
+                        title: file.name
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+            input.click();
+        }
+    });
+
+    window.onload = function () {
+        getCommentList();
+    };
+
+    function getCommentList() {
+        var qna_num = $('input[name=qna_num]').val();
+        $.ajax({
+            type: 'GET', url: "getCommentList", data: {"qna_num": qna_num},
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+            }, success: function (result) {
+                for (var i = 0; i < result.length; i++) {
+                    var str = '<div class="comment">';
+                    str += '관리자 답변';
+                    str += '</div><div>&nbsp;&nbsp;&nbsp;';
+                    str += result[i].qna_answer;
+                    str += '</div><hr/>';
+                    $("#commentList").append(str);
+                }
+            }, error: function (err) {
+                console.log("안되나");
+            }
+        });//ajax
+    }
+</script>
+<div th:insert="~{/common/footer}"></div>
+
+	function getCommentList(){
+		var qna_num= $('input[name=qna_num]').val();
+		$.ajax({
+			type: 'GET', url:"getCommentList", data:{"qna_num":qna_num},
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			}, success: function(result) {
+				for(var i=0; i<result.length; i++){
+					var str='<div class="comment">';
+					str += '관리자 답변';
+					str += '</div><div>&nbsp;&nbsp;&nbsp;';
+					str += result[i].qna_answer;
+					str += '</div><hr/>';
+					$("#commentList").append(str);
+				}
+			},error: function(err){
+				console.log("안되누");
+			}
+		});//ajax
+	}
+</script>
+	<div th:insert="~{/common/footer}"></div>
+
+</body>
+
+</html>

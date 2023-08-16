@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<title>최고의 여행 - 대탈출</title>
+	<link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<script src="/js/jquery.js" />"></script>
+</head>
+
+<body class="d-flex flex-column vh-100">
+<div th:insert="~{/common/header}"></div>
+
+<!--<c:if test="${!empty flashMessage}">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 offset-3">
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    ${flashMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</c:if>-->
+
+<section class="container">
+	<div class="row">
+		<div class="col-md-2">
+			<div class="card mb-3">
+				<div class="card-header">
+					고객센터
+				</div>
+				<div class="list-group list-group-flush">
+					<a th:href="@{/board/faq.do}" class="list-group-item active" id="faqBoard">자주 묻는 질문</a>
+					<a th:href="@{/board/qna.do}" class="list-group-item" id="qnaBoard">질문과 답변</a>
+					<a th:href="@{/board/notice.do}" class="list-group-item" id="noticeBoard">공지사항</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-10 mb-5">
+			<h2 class="mb-4">자주 묻는 질문</h2>
+			<form th:action="@{/board/faqWrite.do}" method="post" class="h-100" id="writeFaqForm">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				<div class="form-floating mb-3">
+					<select name="faq_category" class="form-select" id="floatingSelectCategory"
+							aria-label="category">
+						<option value="1">해외여행</option>
+						<option value="2">항공</option>
+						<option value="3">예약/결제</option>
+						<option value="4">여권/비자/환전</option>
+						<option value="5">홈페이지/기타</option>
+					</select>
+					<label for="floatingSelectCategory">카테고리 선택</label>
+				</div>
+				<div class="form-floating mb-3">
+					<input type="text" name="faq_title" class="form-control" id="floatingInputTitle"
+						   th:placeholder="제목">
+					<label for="floatingInputTitle">제목</label>
+				</div>
+				<div class="form-floating mb-3">
+                        <textarea class="form-control mytextarea" id="floatingTextarea" name="faq_content"
+								  th:placeholder="내용"></textarea>
+					<label for="floatingTextarea">내용</label>
+				</div>
+				<button class="btn btn-outline-secondary">작성 완료</button>
+			</form>
+		</div>
+	</div>
+</section>
+<script src="https://cdn.tiny.cloud/1/mreuxwvmvo99s2c3asxl4t6ujhyqgni44dt6mle4qlfz9pq6/tinymce/5/tinymce.min.js"
+		referrerpolicy="origin"></script>
+<script>
+        tinymce.init({
+            selector: '.mytextarea',
+            height: 500,
+            language: 'ko_KR',
+            plugins: [
+                'advlist autolink link image lists charmap print preview hr anchor pagebreak',
+                'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+                'table emoticons template paste help'
+            ],
+            toolbar: 'undo redo | styleselect | bold italic image | alignleft aligncenter alignright alignjustify | outdent indent',
+            menubar: false,
+            image_title: true,
+            images_upload_url: '/products/htmlImage',
+            images_reuse_filename: true,
+            relative_urls: false,
+            file_picker_types: 'image',
+            file_picker_callback: function (cb, value, meta) {
+                var input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.onchange = function () {
+                    var file = this.files[0];
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        var id = 'blobid' + (new Date()).getTime();
+                        var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                        var base64 = reader.result.split(',')[1];
+                        var blobInfo = blobCache.create(id, file, base64);
+                        blobCache.add(blobInfo);
+                        cb(blobInfo.blobUri(), { title: file.name });
+                    };
+                    reader.readAsDataURL(file);
+                }
+                input.click();
+            }
+        });
+    </script>
+<div th:insert="~{/common/footer}"></div>
+
+</body>
+
+</html>

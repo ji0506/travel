@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+	<title>최고의 여행 - 대탈출</title>
+	<link rel="stylesheet" th:href="@{/bootstrap-5.2.0-dist/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/btn-primary.css}">
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<script src="/js/jquery.js"/>"></script>
+</head>
+
+<body class="d-flex flex-column vh-100">
+	<div th:insert="~{/common/header}"></div>
+
+	<!--<c:if test="${!empty flashMessage}">
+		<div class="container">
+			<div class="row">
+				<div class="col-6 offset-3">
+					<div class="alert alert-primary alert-dismissible fade show" role="alert">
+						${flashMessage}
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>-->
+	<section class="container">
+	<div class="row">
+		<div class="col-md-2">
+			<div class="card mb-3">
+				<div class="card-header">
+					마이 페이지
+				</div>
+				<div class="list-group list-group-flush">
+					<a href="myPage" class="list-group-item">예약내역 확인</a>
+					<a href="edit_check" class="list-group-item active">정보수정/탈퇴</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-10 mb-5">
+			<h2 class="mb-5">정보수정/탈퇴</h2>
+			<div class="row">
+				<div class="mt-5 col-8 offset-2">
+					<c:choose>
+						<c:when test="${!empty withdraw}">
+							<form action="delete" method="post" class="mb-4 text-center">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+								<p>탈퇴를 위해 비밀번호를 입력해 주세요.</p>
+								<input class="form-control mb-3" type="password"
+									name="member_pw" />
+								<button class="btn btn-success mb-3">탈퇴하기</button>
+							</form>
+						</c:when>
+						<c:otherwise>
+							<form action="insertPass" method="post" class="mb-4 text-center">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+								<p>개인정보 확인을 위해 비밀번호를 입력해 주세요.</p>
+								<input class="form-control mb-3" type="password"
+									name="member_pw" />
+								<button class="btn btn-success mb-3">확인</button>
+							</form>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+	<div th:insert="~{/common/footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+	const main = document.querySelector("main");
+
+	document.querySelectorAll(".accordion-body").forEach(tag => tag.addEventListener("click", function () {
+		axios.get("${contextPath}/products/city/" + this.getAttribute("data-city"))
+			.then(function (response) {
+				let html = makeHtml(response.data);
+				main.innerHTML = html;
+			})
+			.catch(function (error) {
+				console.log(error);
+			})
+	}));
+
+	const makeHtml = array => {
+		let html = '<h3 class="mb-3">' + array[0].product_country + '</h3>';
+		html += '<div class="card mb-4">';
+		html += '<div class="card-header">';
+		html += '<h4 class="card-title m-0">' + array[0].product_city + '</h4>';
+		html += '</div>';
+		for (let product of array) {
+			html += '<div class="card-body border-bottom">';
+			html += '<div class="row g-0">';
+			html += '<div class="col-sm-10 col-md-9 col-lg-8 col-xl-7 d-flex flex-column justify-content-center">';
+			html += '<p class="card-title">[' + product.product_city + '] ' + product.product_name + '</p>';
+			html += '<p class="card-text">';
+			html += product.product_airplane + ' ';
+			html += dateString(new Date(product.product_departure));
+			html += ' ~ ';
+			html += dateString(new Date(product.product_arrive));
+			html += '</p>';
+			html += '</div>';
+			html += '<div class="col-sm-2 col-md-3 col-lg-4 col-xl-5 text-center text-sm-end">';
+			html += '<p class="card-text">잔여좌석:' + product.product_seat + '</p>';
+			const seat = product.product_seat;
+			if (seat > 5) {
+				html += '<button class="btn btn-primary" data-num="' + product.product_num + '">상세보기</button>';
+			} else {
+				html += '<button type="button" class="btn btn-danger position-relative" data-num="' + product.product_num + '">상세보기';
+				html += '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">마감 임박!</span></button>';
+			}
+			html += '</div></div></div>';
+		}
+		return html;
+	};
+
+	const dateString = date => {
+		const year = date.getFullYear();
+		let month = date.getMonth() + 1;
+		let day = date.getDate();
+		month = (month >= 10) ? month : "0" + month;
+		day = (day >= 10) ? day : "0" + day;
+		return year + "-" + month + "-" + day;
+	};
+
+	main.addEventListener("click", function (event) {
+		const target = event.target;
+		if (target.tagName !== "BUTTON") return;
+		location.href = "${contextPath}/products/" + target.getAttribute("data-num");
+	});
+</script>
+</body>
+</html>
