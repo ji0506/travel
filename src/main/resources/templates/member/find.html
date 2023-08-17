@@ -13,7 +13,7 @@
 </script>
 
 <body class="d-flex flex-column vh-100">
-	<div th:insert="~{/common/header}"></div>
+	<div th:insert="~{./common/header}"></div>
 
 	<section class="container d-flex flex-column justify-content-center align-items-center h-100">
 		<div class="row w-100">
@@ -270,7 +270,7 @@
 			xhr.setRequestHeader('${_csrf.headerName}', '${_csrf.token}');
 		});*/
 	</script>
-	<div th:insert="~{/common/footer}"></div>
+	<div th:insert="~{./common/footer}"></div>
 
 </body>
 
